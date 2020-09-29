@@ -114,6 +114,8 @@ df_to_db <- function(df, db_table_name){
   
     print(paste("writing timeseries into", db_table_name, "..."))
     
+    n <- ncol(df)
+    
     tryCatch({
       
       # remove existing data for the given runID and calcMethod upfront
@@ -126,7 +128,11 @@ df_to_db <- function(df, db_table_name){
       # Get a query to insert full data frame
       ins_query <- df_to_query(df)
       
-      table_structure <- paste0("(", paste0(names(df), collapse = ","), ")")
+      br_open_v <- c(rep("[",n))
+      br_close_v <- c(rep("]",n))
+      
+      col_names_part <- paste0(paste0(br_open_v,names(df),br_close_v), collapse = ",")
+      table_structure <- paste0("(", col_names_part, ")")
       
       # Insert in data base
       ins_query = paste0("insert into ",
@@ -211,44 +217,6 @@ write_df_to_db <- function(df,
         df_to_upload[,i] <- rep(mapping_v[i], n_rows)
       }
     }
-    
-    # df_col_names_v <- names(df)
-    # req_ind_v <- match(x = df_col_names_v, table = names(column_names_mapping_v), nomatch = NA)
-    # df_col_names_new_v <- as.character(column_names_mapping_v[req_ind_v])
-    # names(df) <- df_col_names_new_v
-    # 
-    # if(!"Dates" %in% df_col_names_new_v)
-    # {
-    #   df$Dates = "missing"
-    # }
-    # else
-    # {
-    #   # Nothing. Already correct
-    # }
-    # 
-    # if(!"IndicatorID" %in% df_col_names_new_v)
-    # {
-    #   df$IndicatorID = "missing"
-    # }
-    # else
-    # {
-    #   # Nothing. Already correct
-    # }
-    # 
-    # if(all(c("Marketid", "IndicatorID", "Dates", "[VAR]") %in% names(df)))
-    # {
-    #   # Prepare table structure
-    #   # This part is very tricky, sqlSave parameters leads to bug.
-    #   df_to_upload <- data.frame(SimID = as.character(db_table_spec_values_v["SimID"]),
-    #                              Marketid = as.character(df[,"Marketid"]),
-    #                              IndicatorID = as.character(df[,"IndicatorID"]),
-    #                              TS_Type = as.character(db_table_spec_values_v["TS_Type"]),
-    #                              CRNCY = as.character(db_table_spec_values_v["CRNCY"]),
-    #                              Dates = as.character(df[,"Dates"]),
-    #                              VAR = as.character(df[,"[VAR]"]),
-    #                              stringsAsFactors = FALSE
-    #                              )
-      
       # Write data frame into DB
       df_to_db(df = df_to_upload, db_table_name = db_table_name)
   } 
@@ -265,7 +233,7 @@ write_df_to_db <- function(df,
 # Connect to the Bloomberg API
 bbcon <- Rblpapi::blpConnect()
 
-ovie = c("END_DT"="20180927") #per 28.09.20: 20180627 fail, 20180902 fail, 20180927 fail, 20180928 ok, 28181102 ok, 20190101 ok, 20190627 ok
+ovie = c("END_DT"="20180927") 
 
 SX5E <- Rblpapi::bds(security = 'SX5E Index', field = 'INDX_MWEIGHT', overrides = ovie)
 df <- SX5E
