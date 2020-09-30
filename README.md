@@ -2,7 +2,7 @@
 * General R notes (not projects)
 * Check wiki. There are many use cases there
 
-# Table of Content
+# Table of Contents
 * Home
 * Bloomberg API (Rblpapi)
 * Connect to DB and execute query from .sql file
