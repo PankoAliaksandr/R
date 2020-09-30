@@ -182,10 +182,16 @@ write_df_to_db <- function(df,
   # Input Parameters:
   #   df: data.frame object to be saved
   #   db_table_name: data base table name to save in
-  #   column_names_mapping_v: a named vector representing the mapping
-  #     between input data.frame column names and DB table column names
-  #   db_table_spec_values_v: DB table can contain field which are
-  #     supposed to be filled from another source (not from input data.frame)
+  #   mapping_v: is a named vector which stores values of 2 types
+  #     case 1: character strings which will be used as a value for each row
+  #       Ex. mapping_v["IndicatorID"] = "Percentage Weight"
+  #     case 2: negative integer values (indexes of the corresponding input df column)
+  #       Ex. mapping_v["MarketID"] = -1. This means that the "MarketID" column will be
+  #         populated as df[,1]
+  
+  # Note:
+  #   Negative values are used on purpose to avoid potential problems
+  #   By name it is also not save: Ex IndicatorID = "Percentage Weight" and the same value has the df column name
 
   if(is.data.frame(df) &&
      is.character(db_table_name) &&
